@@ -1,10 +1,12 @@
 from typing import Annotated
-from fastapi import APIRouter, Body, status
+from fastapi import APIRouter, Body, status, Depends
+from dishka.integrations.fastapi import inject, FromDishka
 
-from src.core.mediator import get_mediator
+from src.core.mediator.mediator import Mediator
 from src.domain.value_object.code_games import GameCode
 from src.application.use_cases.game.get_all import GetGamesRequest
 from src.application.use_cases.game.get_outcome_settings import GetOutcomeSettingsRequest
+from src.presentation.api.v1.depandancies.permissions import require_admin
 from src.presentation.api.v1.schemas.requests.game import UpdateOutcomeSettingsSchema
 from src.presentation.api.v1.schemas.responses.game import GameOutcomeSettingResponseSchema, GameResponseSchema
 
@@ -19,7 +21,8 @@ router = APIRouter(prefix="/games", tags=["Игры"])
     status_code=status.HTTP_200_OK,
     summary="Получение списка доступных игр",
 )
-async def get_games() -> list[GameResponseSchema]:
+@inject
+async def get_games(mediator: FromDishka[Mediator]) -> list[GameResponseSchema]:
     """
     Возвращает список всех игр, доступных в приложении.
 
@@ -30,7 +33,6 @@ async def get_games() -> list[GameResponseSchema]:
     **Response:**
     - Список объектов, содержащих код игры и её название.
     """
-    mediator = get_mediator()
     request = GetGamesRequest()
 
     games = await mediator.handle(request)
@@ -40,12 +42,15 @@ async def get_games() -> list[GameResponseSchema]:
 # GET /games/{game_code}/settings — вероятности
 @router.get(
     "/{game_code}/settings",
+    dependencies=[Depends(require_admin)],
     response_model=list[GameOutcomeSettingResponseSchema],
     status_code=status.HTTP_200_OK,
     summary="Получение настроек вероятностей игры",
 )
+@inject
 async def get_game_outcome_settings(
     game_code: GameCode,
+    mediator: FromDishka[Mediator],
 ) -> list[GameOutcomeSettingResponseSchema]:
     """
     Возвращает текущие настройки вероятностей исходов для указанной игры.
@@ -56,7 +61,6 @@ async def get_game_outcome_settings(
     **Response:**
     - Список всех исходов игры с их вероятностями, множителями и статусом активности.
     """
-    mediator = get_mediator()
     request = GetOutcomeSettingsRequest(game_code=game_code)
 
     settings = await mediator.handle(request)
@@ -66,15 +70,18 @@ async def get_game_outcome_settings(
 # POST /games/{game_code}/settings — обновление вероятностей
 @router.post(
     "/{game_code}/settings",
+    dependencies=[Depends(require_admin)],
     status_code=status.HTTP_200_OK,
     summary="Обновление вероятностей игры",
 )
+@inject
 async def update_outcome_settings(
     game_code: GameCode,
     data: Annotated[
         UpdateOutcomeSettingsSchema,
         Body(..., description="Список настроек вероятностей"),
     ],
+    mediator: FromDishka[Mediator]
 ):
     """
     Обновляет вероятность выпадения исходов для указанной игры.
@@ -93,8 +100,6 @@ async def update_outcome_settings(
     **Response:**
     - `{ "status": "ok" }` — после успешного обновления.
     """
-    mediator = get_mediator()
-
     request = data.to_request(game_code)
     await mediator.handle(request)
 

@@ -1,7 +1,8 @@
 from uuid import UUID
 from fastapi import APIRouter, status
+from dishka.integrations.fastapi import inject, FromDishka
 
-from src.core.mediator import get_mediator
+from src.core.mediator.mediator import Mediator
 from src.presentation.api.v1.schemas.requests.payout import ProcessPayoutSchema
 from src.presentation.api.v1.schemas.responses.payout import PayoutResponseSchema
 
@@ -16,7 +17,11 @@ router = APIRouter(prefix="/payouts", tags=["Выплаты"])
     status_code=status.HTTP_200_OK,
     summary="Инициализация выплаты выигрыша",
 )
-async def process_payout(uuid: UUID) -> PayoutResponseSchema:
+@inject
+async def process_payout(
+    uuid: UUID,
+    mediator: FromDishka[Mediator],
+) -> PayoutResponseSchema:
     """
     Инициирует выплату выигрыша пользователю через Telegram Stars.
 
@@ -32,11 +37,7 @@ async def process_payout(uuid: UUID) -> PayoutResponseSchema:
     **Response:**
     - Объект выплаты, содержащий сумму, статус и идентификатор транзакции Stars.
     """
-    mediator = get_mediator()
-
     request = ProcessPayoutSchema(game_round_uuid=uuid)
     dto = await mediator.handle(request.to_request())
-    
+
     return PayoutResponseSchema.from_dto(dto)
-
-

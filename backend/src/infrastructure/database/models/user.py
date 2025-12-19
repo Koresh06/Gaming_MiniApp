@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
-from sqlalchemy import Integer, String
+from sqlalchemy import Integer, String, BigInteger
 
 from src.domain.entities.user import User
 from src.infrastructure.database.models.base import (
@@ -24,7 +24,7 @@ class UserModel(BaseModel, CreatedAtMixin, UpdatedAtMixin):
         primary_key=True,
         unique=True,
     )
-    tg_id: Mapped[int] = mapped_column(Integer, unique=True)
+    tg_id: Mapped[int] = mapped_column(BigInteger, unique=True)
     username: Mapped[str] = mapped_column(String, nullable=True)
     first_name: Mapped[str] = mapped_column(String, nullable=True)
     last_name: Mapped[str] = mapped_column(String)

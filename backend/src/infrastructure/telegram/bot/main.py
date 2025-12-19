@@ -7,12 +7,16 @@ from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
 from aiogram.types import BotCommand, BotCommandScopeDefault
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
+from dishka import make_async_container
+from dishka.integrations.aiogram import AiogramProvider, setup_dishka
 
+from src.core.dependencies.providers import make_base_providers
+from src.core.dependencies.use_cases import UseCasesProvider
 from src.core.config import settings
 from src.infrastructure.telegram.bot.shutdown import on_shutdown
 from src.infrastructure.telegram.bot.startup import on_startup
 
-from src.infrastructure.telegram.bot.handlers.test import router as test_router
+from src.infrastructure.telegram.bot.handlers.router import router
 
 
 logger = logging.getLogger(__name__)
@@ -32,7 +36,10 @@ def create_app() -> None:
     )
     dp = Dispatcher()
 
-    dp.include_router(test_router)
+    container = make_async_container(*make_base_providers(), AiogramProvider())
+    setup_dishka(container=container, router=dp, auto_inject=True)
+
+    dp.include_router(router)
 
     dp.startup.register(on_startup)
     dp.shutdown.register(on_shutdown)
@@ -53,7 +60,6 @@ def create_app() -> None:
         host=settings.bot.web_server_host,
         port=settings.bot.web_server_port,
     )
-
 
 
 if __name__ == "__main__":

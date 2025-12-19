@@ -1,7 +1,8 @@
 from typing import Annotated
 from fastapi import APIRouter, Header, status, Body
+from dishka.integrations.fastapi import inject, FromDishka
 
-from src.core.mediator import get_mediator
+from src.core.mediator.mediator import Mediator
 from src.presentation.api.v1.schemas.requests.stars import (
     StarsPaymentCallbackSchema,
     StarsPayoutCallbackSchema,
@@ -17,11 +18,13 @@ router = APIRouter(prefix="/stars", tags=["Звезды"])
     status_code=status.HTTP_200_OK,
     summary="Callback Telegram Stars по оплате ставки",
 )
+@inject
 async def payment_callback(
     data: Annotated[
         StarsPaymentCallbackSchema,
         Body(..., description="Данные callback от Stars"),
     ],
+    mediator: FromDishka[Mediator],
     secret: str = Header(
         alias="X-Telegram-Bot-Api-Secret-Token",
         description="Секретный токен, подтверждающий, что запрос отправлен Telegram.",
@@ -46,7 +49,6 @@ async def payment_callback(
     **Response:**
     - `{ "status": "ok" }` — после успешной обработки callback.
     """
-    mediator = get_mediator()
     await mediator.handle(data.to_request())
     return {"status": "ok"}
 
@@ -57,11 +59,13 @@ async def payment_callback(
     status_code=status.HTTP_200_OK,
     summary="Callback Telegram Stars о выплате",
 )
+@inject
 async def payout_callback(
     data: Annotated[
         StarsPayoutCallbackSchema,
         Body(..., description="Данные payout callback"),
     ],
+    mediator: FromDishka[Mediator],
     secret: str = Header(
         alias="X-Telegram-Bot-Api-Secret-Token",
         description=(
@@ -88,6 +92,5 @@ async def payout_callback(
     **Response:**
     - `{ "status": "ok" }` — после успешной обработки callback.
     """
-    mediator = get_mediator()
     await mediator.handle(data.to_request())
     return {"status": "ok"}

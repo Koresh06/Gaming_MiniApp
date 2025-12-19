@@ -20,12 +20,16 @@ class SQLAlchemyGameRoundRepository(BaseGameRoundRepository):
         query = select(GameRoundModel).where(GameRoundModel.uuid == uuid)
         result = await self._session.execute(query)
         game_round_model = result.scalars().one_or_none()
+        if game_round_model is None:
+            return None
         return game_round_model.to_entity()
 
     async def get_by_bet_uuid(self, bet_uuid: UUID) -> GameRound | None:
         query = select(GameRoundModel).where(GameRoundModel.bet_uuid == bet_uuid)
         result = await self._session.execute(query)
         game_round_model = result.scalars().one_or_none()
+        if game_round_model is None:
+            return None
         return game_round_model.to_entity()
 
     

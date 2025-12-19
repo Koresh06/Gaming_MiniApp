@@ -31,10 +31,10 @@ class InitPaymentUseCase(UseCase[InitPaymentRequest, InitPaymentDTO]):
 
         user = await self.user_repository.get_by_uuid(bet.user_uuid)
 
-        invoice_id = await self.stars_service.create_payment(
-            tg_id=user.tg_id,
+        invoice_lick: str = await self.stars_service.create_payment(
+            # tg_id=user.tg_id,
             amount=bet.amount,
             bet_uuid=bet.uuid,
         )
 
-        return InitPaymentDTO(invoice_id=invoice_id)
+        return InitPaymentDTO(invoice_link=invoice_lick)

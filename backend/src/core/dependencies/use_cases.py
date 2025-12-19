@@ -1,5 +1,12 @@
 from dishka import Provider, provide, Scope
 
+
+from src.core.config import settings
+
+# AUTH USE CASE
+from src.application.use_cases.auth.auth import TelegramAuthUseCase
+from src.infrastructure.security.jwt import JWTService
+
 # USER USE CASES
 from src.application.use_cases.payment.init import InitPaymentUseCase
 from src.application.use_cases.user.get_by_tg_id import GetUserByTgIdUseCase
@@ -42,6 +49,24 @@ from src.application.services.stars_payment.base import StarsPaymentServiceBase
 
 class UseCasesProvider(Provider):
     scope = Scope.REQUEST
+
+    # ------------------
+    # AUTH USE CASE
+    # ------------------
+
+    @provide
+    def auth_telegram_use_case(
+        self,
+        jwt_service: JWTService,
+        get_user_by_tg_id_use_case: GetUserByTgIdUseCase,
+        create_user_use_case: CreateUserUseCase,
+    ) -> TelegramAuthUseCase:
+        return TelegramAuthUseCase(
+            bot_token=settings.bot.token,
+            jwt_service=jwt_service,
+            get_user_by_tg_id_use_case=get_user_by_tg_id_use_case,
+            create_user_use_case=create_user_use_case,
+        )
 
     # ------------------
     # USER USE CASES
@@ -193,3 +218,4 @@ class UseCasesProvider(Provider):
         transaction_manager: TransactionManager
     ) -> UpdatePayoutStatusUseCase:
         return UpdatePayoutStatusUseCase(payout_repository=payout_repository, transaction_manager=transaction_manager)
+

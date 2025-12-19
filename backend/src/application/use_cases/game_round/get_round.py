@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True, eq=False)
 class GetGameRoundRequest(UseCaseRequest):
-    bet_uuid: UUID
+    round_uuid: UUID
 
 
 @dataclass
@@ -23,15 +23,15 @@ class GetGameRoundUseCase(UseCase[GetGameRoundRequest, GameRoundDTO]):
     async def __call__(self, request: GetGameRoundRequest) -> GameRoundDTO:
         logger.info(
             "Запрос на получение игрового раунда",
-            extra={"bet_uuid": str(request.bet_uuid)}
+            extra={"round_uuid": str(request.round_uuid)}
         )
 
-        game_round = await self.round_repository.get_by_bet_uuid(request.bet_uuid)
+        game_round = await self.round_repository.get_by_uuid(request.round_uuid)
 
         if game_round is None:
             logger.warning(
                 "Игровой раунд не найден",
-                extra={"bet_uuid": str(request.bet_uuid)}
+                extra={"round_uuid": str(request.round_uuid)}
             )
             raise GameRoundNotFound()
 

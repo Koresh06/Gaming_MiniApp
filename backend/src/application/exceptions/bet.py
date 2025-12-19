@@ -11,3 +11,9 @@ class BetNotPaid(LogicException):
     _status_code: int = 400
     _error_code: str = "BET_NOT_PAID"
     _message: str = "Ставка не оплачена"
+
+
+class BetAlreadyPaid(LogicException):
+    _status_code: int = 400
+    _error_code: str = "BET_ALREADY_PAID"
+    _message: str = "Ставка уже оплачена"

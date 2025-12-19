@@ -100,10 +100,11 @@ class ProcessPayoutUseCase(UseCase[ProcessPayoutRequest, PayoutDTO]):
         )
 
         try:
-            payout_id: str = await self.stars_service.create_payout(
+            telegram_payout_id: str = await self.stars_service.create_payout(
                 tg_id=user.tg_id,
                 amount=payout.amount,
                 round_uuid=request.game_round_uuid,
+                game_code=round.game_code
             )
         except Exception as e:
             logger.error(
@@ -121,11 +122,11 @@ class ProcessPayoutUseCase(UseCase[ProcessPayoutRequest, PayoutDTO]):
             "Получен payout_id от Telegram Stars",
             extra={
                 "payout_uuid": str(payout.uuid),
-                "telegram_payout_id": payout_id,
+                "telegram_payout_id": telegram_payout_id,
             }
         )
 
-        payout.telegram_payout_id = payout_id
+        payout.telegram_payout_id = telegram_payout_id
         payout.status = PayoutStatus.PENDING
 
         await self.payout_repository.update(payout)
@@ -135,7 +136,7 @@ class ProcessPayoutUseCase(UseCase[ProcessPayoutRequest, PayoutDTO]):
             extra={
                 "payout_uuid": str(payout.uuid),
                 "new_status": payout.status.value,
-                "telegram_payout_id": payout_id,
+                "telegram_payout_id": telegram_payout_id,
             }
         )
 

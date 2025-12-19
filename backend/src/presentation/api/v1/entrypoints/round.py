@@ -1,8 +1,10 @@
 from uuid import UUID
 from typing import Annotated
 from fastapi import APIRouter, status, Body
+from dishka.integrations.fastapi import inject, FromDishka
 
-from src.core.mediator import get_mediator
+
+from src.core.mediator.mediator import Mediator
 from src.application.use_cases.game_round.get_round import GetGameRoundRequest
 from src.presentation.api.v1.schemas.requests.game_round import PlayGameSchema
 from src.presentation.api.v1.schemas.responses.game_round import GameRoundResponseSchema
@@ -18,11 +20,13 @@ router = APIRouter(prefix="/rounds", tags=["Раунды"])
     status_code=status.HTTP_201_CREATED,
     summary="Запуск игры по оплаченной ставке",
 )
+@inject
 async def play_game(
     data: Annotated[
         PlayGameSchema,
         Body(..., description="UUID ставки"),
     ],
+    mediator: FromDishka[Mediator],
 ) -> GameRoundResponseSchema:
     """
     Запускает игровой раунд на основе оплаченной ставки.
@@ -39,7 +43,6 @@ async def play_game(
     **Response:**
     - Полная информация о раунде: исход, выигрыш, seed для анимации.
     """
-    mediator = get_mediator()
     dto = await mediator.handle(data.to_request())
     return GameRoundResponseSchema.from_dto(dto)
 
@@ -51,8 +54,10 @@ async def play_game(
     status_code=status.HTTP_200_OK,
     summary="Получить результат игры",
 )
+@inject
 async def get_round(
     uuid: UUID,
+    mediator: FromDishka[Mediator],
 ) -> GameRoundResponseSchema:
     """
     Возвращает информацию о результате игрового раунда.
@@ -68,8 +73,7 @@ async def get_round(
     **Response:**
     - Данные игрового раунда: исход, выигрыш, seed, время создания.
     """
-    mediator = get_mediator()
-    request = GetGameRoundRequest(bet_uuid=uuid)
+    request = GetGameRoundRequest(round_uuid=uuid)
 
     dto = await mediator.handle(request)
     return GameRoundResponseSchema.from_dto(dto)

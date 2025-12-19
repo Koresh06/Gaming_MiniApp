@@ -8,4 +8,8 @@ async def on_startup(app: Application, bot: Bot):
     await bot.set_webhook(
         url=settings.bot.webhook_url,
         secret_token=settings.bot.secret_token,
+        allowed_updates=[
+            "message",
+            "pre_checkout_query",
+        ],
     )

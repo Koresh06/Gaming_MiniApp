@@ -20,7 +20,7 @@ class BetResponseSchema(BaseModel):
 
 
 class InitPaymentResponseSchema(BaseModel):
-    invoice_id: str
+    invoice_link: str
 
     @classmethod
     def from_dto(cls, dto: InitPaymentDTO) -> "InitPaymentResponseSchema":
