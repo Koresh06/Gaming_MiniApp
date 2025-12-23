@@ -11,7 +11,6 @@ from dishka import make_async_container
 from dishka.integrations.aiogram import AiogramProvider, setup_dishka
 
 from src.core.dependencies.providers import make_base_providers
-from src.core.dependencies.use_cases import UseCasesProvider
 from src.core.config import settings
 from src.infrastructure.telegram.bot.shutdown import on_shutdown
 from src.infrastructure.telegram.bot.startup import on_startup

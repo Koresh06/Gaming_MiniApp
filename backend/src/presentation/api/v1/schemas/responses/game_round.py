@@ -1,9 +1,7 @@
 from uuid import UUID
-from datetime import datetime
 from pydantic import BaseModel
 
 from src.application.use_cases.game_round.play_game_result import GameResult
-from src.application.dtos.game_round import GameRoundDTO
 
 
 class GameResultResponseSchema(BaseModel):

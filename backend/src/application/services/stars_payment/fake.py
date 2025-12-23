@@ -1,7 +1,6 @@
 import logging
 from uuid import UUID
 
-from src.application.exceptions.stars import StarsInvalidCallbackError
 from src.application.services.stars_payment.base import StarsPaymentServiceBase
 
 

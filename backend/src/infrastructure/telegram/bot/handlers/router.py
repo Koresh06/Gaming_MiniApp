@@ -1,8 +1,7 @@
 import logging
 from uuid import UUID
-from aiogram import Router, F, Bot
+from aiogram import Router, F
 from aiogram.types import Message, PreCheckoutQuery
-from aiogram.filters import CommandObject, Command
 from dishka.integrations.aiogram import FromDishka
 
 from src.core.mediator.mediator import Mediator

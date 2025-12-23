@@ -6,8 +6,6 @@ from src.domain.value_object.code_games import GameCode
 from src.application.services.stars_payment.base import StarsPaymentServiceBase
 from src.application.exceptions.stars import (
     StarsPaymentError,
-    StarsPayoutError,
-    StarsInvalidCallbackError,
 )
 
 logger = logging.getLogger(__name__)
