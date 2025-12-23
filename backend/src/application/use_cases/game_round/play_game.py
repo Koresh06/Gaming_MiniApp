@@ -2,13 +2,14 @@ import logging
 from uuid import UUID
 from dataclasses import dataclass
 
-from src.application.dtos.game_round import GameRoundDTO
-from src.application.exceptions.bet import BetNotFound, BetNotPaid
-from src.application.services.game_logic import GameLogicService
-from src.application.use_cases.base import UseCase, UseCaseRequest
 from src.domain.entities.game_round import GameRound
 from src.domain.entities.payout import Payout
 from src.domain.value_object.bet_status import BetStatus
+from src.application.use_cases.game_round.play_game_result import GameResult
+from src.application.exceptions.bet import BetNotFound, BetNotPaid
+from src.application.services.game_logic_service import GameLogicService
+from src.application.use_cases.base import UseCase, UseCaseRequest
+from src.application.services.game_payload_service import GamePayloadService
 from src.infrastructure.database.transaction_manager.base import TransactionManager
 from src.infrastructure.repositories.bet.base import BaseBetRepository
 from src.infrastructure.repositories.game_outcome_settings.base import BaseGameOutcomeSettingRepository
@@ -24,15 +25,16 @@ class PlayGameRequest(UseCaseRequest):
     bet_uuid: UUID
 
 @dataclass
-class PlayGameUseCase(UseCase[PlayGameRequest, GameRoundDTO]):
+class PlayGameUseCase(UseCase[PlayGameRequest, GameResult]):
     bet_repository: BaseBetRepository
     round_repository: BaseGameRoundRepository
     outcome_repository: BaseGameOutcomeSettingRepository
     payout_repository: BasePayoutRepository
     game_logic_service: GameLogicService
+    payload_service: GamePayloadService
     transaction_manager: TransactionManager
 
-    async def __call__(self, request: PlayGameRequest) -> GameRoundDTO:
+    async def __call__(self, request: PlayGameRequest) -> GameResult:
         logger.info(
             "Запуск PlayGameUseCase",
             extra={"bet_uuid": str(request.bet_uuid)}
@@ -155,4 +157,17 @@ class PlayGameUseCase(UseCase[PlayGameRequest, GameRoundDTO]):
             extra={"round_uuid": str(game_round.uuid)}
         )
 
-        return GameRoundDTO.from_entity(game_round)
+        payload = self.payload_service.build_payload(
+            game_code=game_round.game_code,
+            outcome_code=game_round.outcome_code,
+            seed=game_round.seed,
+        )
+
+        return GameResult(
+            round_uuid=game_round.uuid,
+            game_code=game_round.game_code,
+            outcome_code=game_round.outcome_code,
+            is_win=game_round.is_win,
+            win_amount=game_round.win_amount,
+            payload=payload,
+        )

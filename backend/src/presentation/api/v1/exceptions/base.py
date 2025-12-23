@@ -1,17 +1,17 @@
 from fastapi.responses import JSONResponse
 
-from src.domain.exceptions.base import BaseInternalException
+from src.domain.exceptions.base import ApplicationException
 
 
-class BaseHttpException(BaseInternalException):
+class BaseHttpException(ApplicationException):
 
     @classmethod
     def get_response(cls) -> JSONResponse:
         return JSONResponse(
-            status_code=cls._status_code,
+            status_code=cls.status_code,
             content={
                 "status": "error",
-                "error_code": cls._error_code,
-                "message": cls._message,
+                "error_code": cls.error_code,
+                "message": cls.message,
             },
-    )
+        )

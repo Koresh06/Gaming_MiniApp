@@ -2,7 +2,9 @@ from dishka import Provider, provide, Scope
 
 from src.core.config import AppSettings
 from src.core.config import settings    
-from src.application.services.game_logic import GameLogicService
+from src.application.services.payload_builder import get_payload_builders
+from src.application.services.game_payload_service import GamePayloadService
+from src.application.services.game_logic_service import GameLogicService
 from src.application.services.stars_payment.base import StarsPaymentServiceBase
 from src.application.services.stars_payment.fake import FakeStarsPaymentService
 from src.application.services.stars_payment.impl import ImplStarsPaymentService
@@ -36,3 +38,9 @@ class ServicesProvider(Provider):
 
         return ImplStarsPaymentService(settings.bot.token)
     
+    @provide
+    def game_payload_service(self) -> GamePayloadService:
+        return GamePayloadService(
+            builders=get_payload_builders()
+        )
+        

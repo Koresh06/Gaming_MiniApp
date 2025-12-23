@@ -1,5 +1,5 @@
-from src.domain.exceptions.base import BaseInternalException
+from src.domain.exceptions.base import ApplicationException
 
 
-class LogicException(BaseInternalException):
+class LogicException(ApplicationException):
     pass

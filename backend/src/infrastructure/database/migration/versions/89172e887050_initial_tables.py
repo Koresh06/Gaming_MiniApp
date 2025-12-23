@@ -1,8 +1,8 @@
-"""initial tables
+"""Initial tables
 
-Revision ID: f692bda74460
+Revision ID: 89172e887050
 Revises: 
-Create Date: 2025-12-13 13:13:16.226850
+Create Date: 2025-12-21 02:00:05.055117
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'f692bda74460'
+revision: str = '89172e887050'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -24,7 +24,7 @@ def upgrade() -> None:
     op.create_table('game_outcome_settings',
     sa.Column('uuid', sa.UUID(), nullable=False),
     sa.Column('game_code', sa.Enum('SLOT', 'BOWLING', 'BASKETBALL', 'FOOTBALL', 'DICE', 'DARTS', name='gamecode'), nullable=False),
-    sa.Column('outcome_code', sa.Enum('WIN_SMALL', 'LOSE', 'JACKPOT', 'SCORE_1', 'DICE_6', name='outcomecode'), nullable=False),
+    sa.Column('outcome_code', sa.Enum('LOSE', 'WIN', 'JACKPOT', name='outcomecode'), nullable=False),
     sa.Column('probability', sa.Float(), nullable=False),
     sa.Column('multiplier', sa.Float(), nullable=False),
     sa.Column('is_active', sa.Boolean(), nullable=False),
@@ -35,7 +35,7 @@ def upgrade() -> None:
     )
     op.create_table('users',
     sa.Column('uuid', sa.UUID(), nullable=False),
-    sa.Column('tg_id', sa.Integer(), nullable=False),
+    sa.Column('tg_id', sa.BigInteger(), nullable=False),
     sa.Column('username', sa.String(), nullable=True),
     sa.Column('first_name', sa.String(), nullable=True),
     sa.Column('last_name', sa.String(), nullable=False),
@@ -67,7 +67,7 @@ def upgrade() -> None:
     sa.Column('bet_uuid', sa.UUID(), nullable=False),
     sa.Column('user_uuid', sa.UUID(), nullable=False),
     sa.Column('game_code', sa.Enum('SLOT', 'BOWLING', 'BASKETBALL', 'FOOTBALL', 'DICE', 'DARTS', name='gamecode'), nullable=False),
-    sa.Column('outcome_code', sa.Enum('WIN_SMALL', 'LOSE', 'JACKPOT', 'SCORE_1', 'DICE_6', name='outcomecode'), nullable=False),
+    sa.Column('outcome_code', sa.Enum('LOSE', 'WIN', 'JACKPOT', name='outcomecode'), nullable=False),
     sa.Column('is_win', sa.Boolean(), nullable=False),
     sa.Column('win_amount', sa.Integer(), nullable=False),
     sa.Column('seed', sa.String(), nullable=False),

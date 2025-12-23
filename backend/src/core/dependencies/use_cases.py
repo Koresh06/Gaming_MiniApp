@@ -5,7 +5,6 @@ from src.core.config import settings
 
 # AUTH USE CASE
 from src.application.use_cases.auth.auth import TelegramAuthUseCase
-from src.infrastructure.security.jwt import JWTService
 
 # USER USE CASES
 from src.application.use_cases.payment.init import InitPaymentUseCase
@@ -34,17 +33,20 @@ from src.application.use_cases.game_round.get_round import GetGameRoundUseCase
 # PAYOUT USE CASES
 from src.application.use_cases.payout.process import ProcessPayoutUseCase
 from src.application.use_cases.payout.update import UpdatePayoutStatusUseCase
+from src.application.services.game_logic_service import GameLogicService
+from src.application.services.stars_payment.base import StarsPaymentServiceBase
 
 from src.infrastructure.database.transaction_manager.base import TransactionManager
 from src.infrastructure.repositories.bet.base import BaseBetRepository
 from src.infrastructure.repositories.game_outcome_settings.base import (
     BaseGameOutcomeSettingRepository,
 )
+
+from src.application.services.game_payload_service import GamePayloadService
 from src.infrastructure.repositories.game_round.base import BaseGameRoundRepository
 from src.infrastructure.repositories.payout.base import BasePayoutRepository
 from src.infrastructure.repositories.user.base import BaseUserRepository
-from src.application.services.game_logic import GameLogicService
-from src.application.services.stars_payment.base import StarsPaymentServiceBase
+from src.infrastructure.security.jwt import JWTService
 
 
 class UseCasesProvider(Provider):
@@ -173,6 +175,7 @@ class UseCasesProvider(Provider):
         game_round_repository: BaseGameRoundRepository,
         game_outcome_setting_repository: BaseGameOutcomeSettingRepository,
         payout_repository: BasePayoutRepository,
+        payload_service: GamePayloadService,
         game_logic_service: GameLogicService,
         transaction_manager: TransactionManager,
     ) -> PlayGameUseCase:
@@ -182,6 +185,7 @@ class UseCasesProvider(Provider):
             outcome_repository=game_outcome_setting_repository,
             payout_repository=payout_repository,
             game_logic_service=game_logic_service,
+            payload_service=payload_service,
             transaction_manager=transaction_manager,
         )
 

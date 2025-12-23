@@ -3,7 +3,7 @@ import logging
 from dataclasses import dataclass
 
 from src.application.dtos.game_outcome_setting import GameOutcomeSettingInputDTO
-from src.application.services.game_logic import GameLogicService
+from src.application.services.game_logic_service import GameLogicService
 from src.application.use_cases.base import UseCase, UseCaseRequest
 from src.domain.value_object.code_games import GameCode
 from src.infrastructure.database.transaction_manager.base import TransactionManager

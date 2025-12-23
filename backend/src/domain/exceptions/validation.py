@@ -1,7 +1,7 @@
-from src.domain.exceptions.base import BaseInternalException
+from src.domain.exceptions.base import ApplicationException
 
 
-class DomainValidationError(BaseInternalException):
-    _status_code: int = 422
-    _error_code: str = "DOMAIN_VALIDATION_ERROR"
-    _message: str = "Произошла ошибка валидации"
+class DomainValidationError(ApplicationException):
+    status_code: int = 422
+    error_code: str = "DOMAIN_VALIDATION_ERROR"
+    message: str = "Произошла ошибка валидации"

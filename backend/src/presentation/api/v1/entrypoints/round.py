@@ -7,7 +7,7 @@ from dishka.integrations.fastapi import inject, FromDishka
 from src.core.mediator.mediator import Mediator
 from src.application.use_cases.game_round.get_round import GetGameRoundRequest
 from src.presentation.api.v1.schemas.requests.game_round import PlayGameSchema
-from src.presentation.api.v1.schemas.responses.game_round import GameRoundResponseSchema
+from src.presentation.api.v1.schemas.responses.game_round import GameResultResponseSchema
 
 
 router = APIRouter(prefix="/rounds", tags=["Раунды"])
@@ -16,7 +16,7 @@ router = APIRouter(prefix="/rounds", tags=["Раунды"])
 # POST /rounds/play — запуск игры
 @router.post(
     "/play",
-    response_model=GameRoundResponseSchema,
+    response_model=GameResultResponseSchema,
     status_code=status.HTTP_201_CREATED,
     summary="Запуск игры по оплаченной ставке",
 )
@@ -27,7 +27,7 @@ async def play_game(
         Body(..., description="UUID ставки"),
     ],
     mediator: FromDishka[Mediator],
-) -> GameRoundResponseSchema:
+) -> GameResultResponseSchema:
     """
     Запускает игровой раунд на основе оплаченной ставки.
 
@@ -44,13 +44,13 @@ async def play_game(
     - Полная информация о раунде: исход, выигрыш, seed для анимации.
     """
     dto = await mediator.handle(data.to_request())
-    return GameRoundResponseSchema.from_dto(dto)
+    return GameResultResponseSchema.from_dto(dto)
 
 
 # GET /rounds/{uuid}
 @router.get(
     "/{uuid}",
-    response_model=GameRoundResponseSchema,
+    response_model=GameResultResponseSchema,
     status_code=status.HTTP_200_OK,
     summary="Получить результат игры",
 )
@@ -58,7 +58,7 @@ async def play_game(
 async def get_round(
     uuid: UUID,
     mediator: FromDishka[Mediator],
-) -> GameRoundResponseSchema:
+) -> GameResultResponseSchema:
     """
     Возвращает информацию о результате игрового раунда.
 
@@ -76,4 +76,4 @@ async def get_round(
     request = GetGameRoundRequest(round_uuid=uuid)
 
     dto = await mediator.handle(request)
-    return GameRoundResponseSchema.from_dto(dto)
+    return GameResultResponseSchema.from_dto(dto)

@@ -4,27 +4,30 @@ from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException
 from sqlalchemy.exc import IntegrityError
 
-from src.domain.exceptions.base import BaseInternalException
+from src.domain.exceptions.base import ApplicationException
 
 
 def register_exception_handlers(app: FastAPI):
     """
     Регистрирует обработчики ошибок приложения.
     """
-    @app.exception_handler(BaseInternalException)
-    async def internal_exception_handler(request: Request, exc: BaseInternalException):
+
+    @app.exception_handler(ApplicationException)
+    async def internal_exception_handler(request: Request, exc: ApplicationException):
         return JSONResponse(
-            status_code=exc.get_status_code(),
+            status_code=exc.getstatus_code(),
             content={
                 "status": "error",
-                "status_code": exc.get_status_code(),
-                "error_code": exc.get_error_code(),
-                "message": exc.get_message(),
+                "status_code": exc.getstatus_code(),
+                "error_code": exc.geterror_code(),
+                "message": exc.getmessage(),
             },
         )
 
     @app.exception_handler(RequestValidationError)
-    async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    async def validation_exception_handler(
+        request: Request, exc: RequestValidationError
+    ):
         return JSONResponse(
             status_code=422,
             content={
@@ -43,7 +46,7 @@ def register_exception_handlers(app: FastAPI):
             content={
                 "status": "error",
                 "status_code": exc.status_code,
-                "error_code": exc.detail,  
+                "error_code": exc.detail,
                 "message": exc.detail,
             },
         )

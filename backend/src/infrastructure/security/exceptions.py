@@ -1,7 +1,7 @@
-from src.domain.exceptions.base import BaseInternalException
+from src.domain.exceptions.base import ApplicationException
 
 
-class TelegramAuthError(BaseInternalException):
+class TelegramAuthError(ApplicationException):
     message = "Неверные данные инициализации Telegram."
     error_code = "TELEGRAM_AUTH_ERROR"
     status_code = 401
